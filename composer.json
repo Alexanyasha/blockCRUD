@@ -1,0 +1,50 @@
+{
+    "name": "designcoda/backpack-blockcrud",
+    "type": "library",
+    "description": "An admin panel for block items, using Backpack\\CRUD on Laravel 7.",
+    "keywords": [
+        "backpack",
+        "BlockCRUD"
+    ],
+    "homepage": "https://github.com/Alexanyasha/blockCRUD",
+    "license": "proprietary",
+    "authors": [
+        {
+            "name": "Alexandra Shuvalova",
+            "email": "as@indep.pro",
+            "role": "Developer"
+        }
+    ],
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "require": {
+        "backpack/crud": "^4.1.0|^4.0.0",
+        "backpack/pagemanager": "^3.0|^2.0"
+    },
+    "require-dev": {
+        "phpunit/phpunit" : "^9.0||^7.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Backpack\\BlockCRUD\\": "src"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Backpack\\BlockCRUD\\": "tests"
+        }
+    },
+    "scripts": {
+        "test": "vendor/bin/phpunit --testdox"
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-master": "1.0-dev"
+        },
+        "laravel": {
+            "providers": [
+                "Backpack\\BlockCRUD\\BlockCRUDServiceProvider"
+            ]
+        }
+    }
+}
