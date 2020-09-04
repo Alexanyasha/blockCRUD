@@ -18,5 +18,5 @@ Route::group([
     ),
     'namespace' => 'Admin',
 ], function () {
-    Route::crud('blocks', 'BlocksItemCrudController');
+    Route::crud('blocks', 'BlockItemCrudController');
 });
