@@ -16,7 +16,7 @@ Route::group([
         (array) config('backpack.base.web_middleware', 'web'),
         (array) config('backpack.base.middleware_key', 'admin')
     ),
-    'namespace' => 'Admin',
+    'namespace' => 'Backpack\BlockCRUD\app\Http\Controllers\Admin',
 ], function () {
-    Route::crud('blocks', '\Backpack\BlockCRUD\app\Http\Controllers\Admin\BlockItemCrudController');
+    Route::crud('blocks', 'BlockItemCrudController');
 });
