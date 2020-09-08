@@ -36,7 +36,7 @@ class BlockItemCrudController extends CrudController
             'name' => 'type',
             'type' => 'select_from_array',
             'options' => [
-                'html' => 'Настраиваемый самостоятельно', 
+                'html' => 'HTML', 
                 //'model' => 'Published (visible)'
             ],
         ]);
@@ -44,8 +44,7 @@ class BlockItemCrudController extends CrudController
         CRUD::addColumn([
             'label' => 'Активен',
             'name' => 'publish',
-            'type' => 'checkbox',
-            'checked' => true,
+            'type' => 'boolean',
         ]);
 
         // $this->crud->addButtonFromModelFunction('line', 'open', 'getOpenButton', 'beginning');
@@ -57,24 +56,42 @@ class BlockItemCrudController extends CrudController
 
     protected function setupCreateOperation()
     {
-        // Note:
-        // - default fields, that all templates are using, are set using $this->addDefaultPageFields();
-        // - template-specific fields are set per-template, in the PageTemplates trait;
+        CRUD::addField([
+            'name' => 'name',
+            'label' => 'Название',
+        ]);
+        CRUD::addField([
+            'name' => 'slug',
+            'label' => 'Обозначение',
+            'hint' => 'Латинские буквы, без пробелов',
+        ]);
+        CRUD::addField([
+            'label' => 'Тип',
+            'name' => 'type',
+            'type' => 'select_from_array',
+            'options' => [
+                'html' => 'HTML', 
+                //'model' => 'Published (visible)'
+            ],
+        ]);
+        CRUD::addField([
+            'name' => 'content',
+            'label' => 'Содержание',
+            'type' => 'edit_template',
+            'view_namespace' => 'blockcrud::templates',
+        ]);
+        CRUD::addField([
+            'label' => 'Активен',
+            'name' => 'publish',
+            'type' => 'checkbox',
+            'default' => 1,
+        ]);
 
-        // $this->addDefaultPageFields(request()->input('template'));
-        // $this->useTemplate(request()->input('template'));
-
-        // $this->crud->setValidation(PageRequest::class);
+        // $this->crud->setValidation(BlockRequest::class);
     }
 
     protected function setupUpdateOperation()
     {
-        // if the template in the GET parameter is missing, figure it out from the db
-        // $template = request()->input('template') ?? $this->crud->getCurrentEntry()->template;
-
-        // $this->addDefaultPageFields($template);
-        // $this->useTemplate($template);
-
-        // $this->crud->setValidation(PageRequest::class);
+        $this->setupCreateOperation();
     }
 }

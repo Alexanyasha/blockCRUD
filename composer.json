@@ -38,9 +38,6 @@
         "test": "vendor/bin/phpunit --testdox"
     },
     "extra": {
-        "branch-alias": {
-            "dev-master": "1.0-dev"
-        },
         "laravel": {
             "providers": [
                 "Backpack\\BlockCRUD\\BlockCRUDServiceProvider"

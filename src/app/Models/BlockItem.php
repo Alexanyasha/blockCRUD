@@ -11,44 +11,17 @@ class BlockItem extends Model
 
     protected $table = 'block_items';
     protected $fillable = [
-        'name', 
-        'type', 
+        'name',
+        'slug',
+        'type',
+        'content',
         'model', 
         'model_id', 
         'publish',
     ];
 
-    // public function parent()
-    // {
-    //     return $this->belongsTo('Backpack\BlockCRUD\app\Models\BlockItem', 'parent_id');
-    // }
-
-    // public function children()
-    // {
-    //     return $this->hasMany('Backpack\BlockCRUD\app\Models\BlockItem', 'parent_id');
-    // }
-
-    // public function page()
-    // {
-    //     return $this->belongsTo('Backpack\PageManager\app\Models\Page', 'page_id');
-    // }
-
-    // public function url()
-    // {
-    //     switch ($this->type) {
-    //         case 'external_link':
-    //             return $this->link;
-    //             break;
-
-    //         case 'internal_link':
-    //             return is_null($this->link) ? '#' : url($this->link);
-    //             break;
-
-    //         default: //page_link
-    //             if ($this->page) {
-    //                 return url($this->page->slug);
-    //             }
-    //             break;
-    //     }
-    // }
+    public function scopeActive($query)
+    {
+        return $query->where('publish', 1);
+    }
 }

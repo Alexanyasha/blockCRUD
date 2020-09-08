@@ -1,0 +1,9 @@
+.blockcrud_code_source textarea {
+    height: 100% !important;
+    background: #333;
+    color: #aaa;
+}
+
+.blockcrud_code_preview {
+    overflow: auto;
+}

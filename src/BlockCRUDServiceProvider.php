@@ -2,8 +2,11 @@
 
 namespace Backpack\BlockCRUD;
 
+//use Backpack\BlockCRUD\app\Models\BlockItem;
 use Illuminate\Routing\Router;
+use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\ServiceProvider;
+use View;
 
 class BlockCRUDServiceProvider extends ServiceProvider
 {
@@ -20,7 +23,26 @@ class BlockCRUDServiceProvider extends ServiceProvider
     public function boot()
     {
         // publish migrations
-        $this->publishes([__DIR__ . '/database/migrations' => database_path('migrations')], 'migrations');
+        $this->loadMigrationsFrom(realpath(__DIR__ . '/database/migrations'));
+        $this->loadViewsFrom(realpath(__DIR__ . '/resources/views'), 'blockcrud');
+        View::addNamespace('blockcrud', realpath(__DIR__ . '/resources/views'));
+
+        $this->publishes([__DIR__ . '/resources/css' => public_path('blockcrud/css')], 'blockcrud');
+        $this->publishes([__DIR__ . '/resources/js' => public_path('blockcrud/js')], 'blockcrud');
+
+        Blade::directive('customblock', function ($block_name) {
+            $code = '<?php
+                if(' . $block_name . ') {
+                    $block = \Backpack\BlockCRUD\app\Models\BlockItem::active()->where(\'slug\', ' . $block_name . ')->first();
+
+                    if($block) {
+                        echo $block->content;
+                    }
+                }
+            ?>';
+
+            return $code;
+        });
     }
 
     /**
