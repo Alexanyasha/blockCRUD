@@ -81,7 +81,10 @@ Now you can create and update new blocks in adminpanel section of your site.
 **Content** - HTML code of block. You can see live preview on the right with encapsulated hardcoded css-file /css/style.css. Applying custom styles will be set in config in future versions of add-on.  
 **Active** - show on pages flag.  
 
-After creating a block you can insert directive (`@customblock('my-block')`) in any place of your page content.
+After creating a block you can insert directive (`@customblock('my-block')`) in any place of your page content. If you use code from database (for example, in PageManager), wrap your code in Blade templates with directive
+```
+@pageblocks ($page->content)
+```
 
 
 ### Использование (рус.)
@@ -93,7 +96,10 @@ After creating a block you can insert directive (`@customblock('my-block')`) in 
 **Содержание** - HTML-код вашего блока. Справа находится живое превью вашего блока с изолированным css-файлом /css/style.css. Применение своих стилей будет реализовано в будущих версиях аддона.  
 **Активен** - флаг показывать/не показывать на странице.  
 
-После сохранения блока вы можете вставить его в любое место контента страницы с помощью директивы Blade (`@customblock('my-block')`). 
+После сохранения блока вы можете вставить его в любое место контента страницы с помощью директивы Blade (`@customblock('my-block')`). Если вы используете код из базы данных (например, из аддона PageManager), оберните код в дополнительную директиву Blade
+```
+@pageblocks ($page->content)
+```
 
 
 

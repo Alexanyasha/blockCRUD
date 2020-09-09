@@ -43,6 +43,28 @@ class BlockCRUDServiceProvider extends ServiceProvider
 
             return $code;
         });
+
+        Blade::directive('pageblocks', function ($content) {
+            $code = '<?php
+                $content = ' . $content . ';
+
+                preg_match_all("/@customblock\(\'(?P<slug>.+)\'\)/i", $content, $matches);
+
+                foreach($matches["slug"] as $slug) {
+                    $block = \Backpack\BlockCRUD\app\Models\BlockItem::active()->where(\'slug\', $slug)->first();
+
+                    if($block) {
+                        $replace = $block->content;
+
+                        $content = str_ireplace("@customblock(\'" . $slug . "\')", $replace, $content);
+                    }
+                }
+
+                echo $content;
+            ?>';
+
+            return $code;
+        });
     }
 
     /**
