@@ -32,7 +32,7 @@ class BlockItemCrudController extends CrudController
     private function getModels(){
         $paths = [
             //app_path() => 'App',
-            app_path() . '/models' => 'App\Models',
+            app_path() . '/Models' => 'App\Models',
         ];
 
         $out = [];
