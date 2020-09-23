@@ -3,35 +3,41 @@
 @endsection
 
 @include('crud::fields.inc.wrapper_start')
-    <label>{!! $field['label'] !!}</label>
-    <div class="blockcrud_code_editor d-flex">
-        <div class="blockcrud_code_source col-12 col-lg-6">
-            <textarea
-                type="text"
-                name="{{ $field['name'] }}"
-                @include('crud::fields.inc.attributes')
-            >{{ old($field['name']) ? old($field['name']) : (isset($field['value']) ? $field['value'] : (isset($field['default']) ? $field['default'] : '' )) }}</textarea>
-        </div>
-        <div class="blockcrud_code_preview col-12 col-lg-6">
-            
-            <preview-code stylesheet="/css/style.css"></preview-code>
+    <div class="blockcrud_toggle_wrapper">
+        @forelse ($field['show_when'] as $fi => $val)
+            <input class="blockcrud_toggle_when" type="hidden" name="cond_{{ $fi }}" value="{{ $val }}">
+        @empty
 
-            <script>
-                customElements.define('preview-code', class extends HTMLElement {
-                    connectedCallback() {
-                        const shadow = this.attachShadow({mode: 'open'});
-                        shadow.innerHTML = `
-                            <link rel="stylesheet" type="text/css" href="${this.getAttribute('stylesheet')}">
-                            <div class="shadow_wrapper">
-                                {!! old($field['name']) ? old($field['name']) : (isset($field['value']) ? $field['value'] : (isset($field['default']) ? $field['default'] : '' )) !!}
-                            </div>
-                        `;
-                    }
-                });
-            </script>
+        @endforelse
+        <label>{!! $field['label'] !!}</label>
+        <div class="blockcrud_code_editor d-flex">
+            <div class="blockcrud_code_source col-12 col-lg-6">
+                <textarea
+                    type="text"
+                    name="{{ $field['name'] }}"
+                    @include('crud::fields.inc.attributes')
+                >{{ old($field['name']) ? old($field['name']) : (isset($field['value']) ? $field['value'] : (isset($field['default']) ? $field['default'] : '' )) }}</textarea>
+            </div>
+            <div class="blockcrud_code_preview col-12 col-lg-6">
+                
+                <preview-code stylesheet="/css/style.css"></preview-code>
+
+                <script>
+                    customElements.define('preview-code', class extends HTMLElement {
+                        connectedCallback() {
+                            const shadow = this.attachShadow({mode: 'open'});
+                            shadow.innerHTML = `
+                                <link rel="stylesheet" type="text/css" href="${this.getAttribute('stylesheet')}">
+                                <div class="shadow_wrapper">
+                                    {!! old($field['name']) ? old($field['name']) : (isset($field['value']) ? $field['value'] : (isset($field['default']) ? $field['default'] : '' )) !!}
+                                </div>
+                            `;
+                        }
+                    });
+                </script>
+            </div>
         </div>
     </div>
-
 
     {{-- HINT --}}
     @if (isset($field['hint']))

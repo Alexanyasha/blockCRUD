@@ -36,7 +36,22 @@ class BlockCRUDServiceProvider extends ServiceProvider
                     $block = \Backpack\BlockCRUD\app\Models\BlockItem::active()->where(\'slug\', ' . $block_name . ')->first();
 
                     if($block) {
-                        echo $block->content;
+                        $echo = $block->content;
+
+                        if($block->type == "model") {
+                            $model = new $block->model;
+                            $items = $model::all();
+
+                            if($items) {
+                                if(isset($model->blockcrud_template)) {
+                                    $echo = view($model->blockcrud_template, compact("items"))->render();
+                                } else {
+                                    $echo = view("blockcrud::blocks.default", compact("items"))->render();
+                                }
+                            } 
+                        }
+
+                        echo $echo;
                     }
                 }
             ?>';
@@ -55,6 +70,20 @@ class BlockCRUDServiceProvider extends ServiceProvider
 
                     if($block) {
                         $replace = $block->content;
+
+                        if($block->type == "model") {
+                            $model = new $block->model;
+                            $items = $model::all();
+
+                            if($items) {
+                                if(isset($model->blockcrud_template)) {
+                                    $replace = view($model->blockcrud_template, compact("items"))->render();
+                                } else {
+                                    $replace = view("blockcrud::blocks.default", compact("items"))->render();
+                                }
+                            }
+                            
+                        } 
 
                         $content = str_ireplace("@customblock(\'" . $slug . "\')", $replace, $content);
                     }

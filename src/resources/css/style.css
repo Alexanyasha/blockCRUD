@@ -7,3 +7,7 @@
 .blockcrud_code_preview {
     overflow: auto;
 }
+
+.blockcrud_hidden {
+    display: none !important;
+}
