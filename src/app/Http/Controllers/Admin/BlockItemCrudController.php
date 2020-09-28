@@ -2,13 +2,13 @@
 
 namespace Backpack\BlockCRUD\app\Http\Controllers\Admin;
 
+use Backpack\BlockCRUD\app\Http\Requests\BlockRequest;
 use Backpack\CRUD\app\Http\Controllers\CrudController;
 use Backpack\CRUD\app\Http\Controllers\Operations\CreateOperation;
 use Backpack\CRUD\app\Http\Controllers\Operations\DeleteOperation;
 use Backpack\CRUD\app\Http\Controllers\Operations\ListOperation;
 use Backpack\CRUD\app\Http\Controllers\Operations\ReorderOperation;
 use Backpack\CRUD\app\Http\Controllers\Operations\UpdateOperation;
-use Backpack\BlockCRUD\app\Http\Requests\BlockRequest;
 use Backpack\CRUD\app\Library\CrudPanel\CrudPanelFacade as CRUD;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
@@ -27,47 +27,6 @@ class BlockItemCrudController extends CrudController
         CRUD::setRoute(config('backpack.base.route_prefix') . '/blocks');
         CRUD::setEntityNameStrings('block item', 'block items');
     }
-
-
-    private function getModels(){
-        $paths = [
-            //app_path() => 'App',
-            app_path() . '/Models' => 'App\Models',
-        ];
-
-        $out = [];
-
-        foreach($paths as $path => $namespace) {
-            $iterator = new RecursiveIteratorIterator(
-                new RecursiveDirectoryIterator($path), RecursiveIteratorIterator::SELF_FIRST
-            );
-
-            foreach ($iterator as $item) {
-                /**
-                 * @var \SplFileInfo $item
-                 */
-                if($item->isReadable() && $item->isFile() && mb_strtolower($item->getExtension()) === 'php') {
-                    $model = str_replace('/', '', mb_substr($item->getRealPath(), mb_strlen($path), -4));
-                    $modelname = $model;
-                    $entity_path = $namespace . '\\' . $model;
-
-                    $entity = new $entity_path;
-                    if(! $entity || isset($entity->blockcrud_ignore)) {
-                        continue;
-                    }
-
-                    if($entity && isset($entity->blockcrud_title)) {
-                        $modelname = $entity->blockcrud_title;
-                    }
-
-                    $out[$entity_path] =  $modelname;
-                }
-            }
-        }
-
-        return $out;
-    }
-
 
     protected function setupListOperation()
     {
@@ -161,4 +120,45 @@ class BlockItemCrudController extends CrudController
     {
         $this->setupCreateOperation(false);
     }
+
+    
+    private function getModels(){
+        $paths = [
+            //app_path() => 'App',
+            app_path() . '/Models' => 'App\Models',
+        ];
+
+        $out = [];
+
+        foreach($paths as $path => $namespace) {
+            $iterator = new RecursiveIteratorIterator(
+                new RecursiveDirectoryIterator($path), RecursiveIteratorIterator::SELF_FIRST
+            );
+
+            foreach ($iterator as $item) {
+                /**
+                 * @var \SplFileInfo $item
+                 */
+                if($item->isReadable() && $item->isFile() && mb_strtolower($item->getExtension()) === 'php') {
+                    $model = str_replace('/', '', mb_substr($item->getRealPath(), mb_strlen($path), -4));
+                    $modelname = $model;
+                    $entity_path = $namespace . '\\' . $model;
+
+                    $entity = new $entity_path;
+                    if(! $entity || isset($entity->blockcrud_ignore)) {
+                        continue;
+                    }
+
+                    if($entity && isset($entity->blockcrud_title)) {
+                        $modelname = $entity->blockcrud_title;
+                    }
+
+                    $out[$entity_path] =  $modelname;
+                }
+            }
+        }
+
+        return $out;
+    }
+
 }

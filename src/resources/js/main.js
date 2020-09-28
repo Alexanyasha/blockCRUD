@@ -38,8 +38,10 @@ for (let j = 0; j < toggleBlocks.length; j++) {
             input.addEventListener('select', toggleInput);
             input.setAttribute('data-listen', true);
 
-            var evt = new Event('change');
-            input.dispatchEvent(evt);
+            setTimeout(function() {
+                var evt = new Event('change');
+                input.dispatchEvent(evt);
+            }, 500);
         }
     }
 }
