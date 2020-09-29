@@ -21,6 +21,12 @@ class BlockItemCrudController extends CrudController
     use DeleteOperation;
     use ReorderOperation;
 
+    public $types = [
+        'html' => 'HTML', 
+        'model' => 'Сущность',
+        'template' => 'Шаблон',
+    ];
+
     public function setup()
     {
         CRUD::setModel("Backpack\BlockCRUD\app\Models\BlockItem");
@@ -38,10 +44,7 @@ class BlockItemCrudController extends CrudController
             'label' => 'Тип',
             'name' => 'type',
             'type' => 'select_from_array',
-            'options' => [
-                'html' => 'HTML', 
-                'model' => 'Сущность',
-            ],
+            'options' => $this->types,
         ]);
 
         CRUD::addColumn([
@@ -76,10 +79,7 @@ class BlockItemCrudController extends CrudController
             'label' => 'Тип',
             'name' => 'type',
             'type' => 'select_from_array',
-            'options' => [
-                'html' => 'HTML', 
-                'model' => 'Сущность',
-            ],
+            'options' => $this->types,
             'allow_null' => false,
         ]);
 

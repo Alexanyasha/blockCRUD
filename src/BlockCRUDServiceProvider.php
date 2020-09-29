@@ -49,6 +49,12 @@ class BlockCRUDServiceProvider extends ServiceProvider
                                     $echo = view("blockcrud::blocks.default", compact("items"))->render();
                                 }
                             } 
+                        } elseif($block->type == "template") {
+                            try {
+                                $echo = view($block->model)->render();
+                            } catch (\Exception $e) {
+                                logger($e->getMessage());
+                            }
                         }
 
                         echo $echo;
@@ -83,7 +89,13 @@ class BlockCRUDServiceProvider extends ServiceProvider
                                 }
                             }
                             
-                        } 
+                        } elseif($block->type == "template") {
+                            try {
+                                $replace = view($block->model)->render();
+                            } catch (\Exception $e) {
+                                logger($e->getMessage());
+                            }
+                        }
 
                         $content = str_ireplace("@customblock(\'" . $slug . "\')", $replace, $content);
                     }
