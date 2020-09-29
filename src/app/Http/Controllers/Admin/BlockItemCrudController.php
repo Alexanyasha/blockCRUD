@@ -109,6 +109,19 @@ class BlockItemCrudController extends CrudController
         ]);
 
         CRUD::addField([
+            'name' => 'model_id',
+            'label' => 'Шаблон',
+            'type' => 'toggle_text',
+            'view_namespace' => 'blockcrud::templates',
+            'attributes' => [
+                'readonly' => true,
+            ],
+            'show_when' => [
+                'type' => 'template',
+            ],
+        ]);
+
+        CRUD::addField([
             'label' => 'Активен',
             'name' => 'publish',
             'type' => 'checkbox',

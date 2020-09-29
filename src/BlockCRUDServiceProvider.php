@@ -51,7 +51,7 @@ class BlockCRUDServiceProvider extends ServiceProvider
                             } 
                         } elseif($block->type == "template") {
                             try {
-                                $echo = view($block->model)->render();
+                                $echo = view($block->model_id)->render();
                             } catch (\Exception $e) {
                                 logger($e->getMessage());
                             }
@@ -91,7 +91,7 @@ class BlockCRUDServiceProvider extends ServiceProvider
                             
                         } elseif($block->type == "template") {
                             try {
-                                $replace = view($block->model)->render();
+                                $replace = view($block->model_id)->render();
                             } catch (\Exception $e) {
                                 logger($e->getMessage());
                             }
