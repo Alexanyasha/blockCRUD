@@ -38,7 +38,8 @@ class BlockCRUDServiceProvider extends ServiceProvider
 
             if(isset($params[0])) {
                 $block_name = str_replace('(', '', str_replace('\'', '', $params[0]));
-                $par_string = str_replace($block_name, '', $args);
+                $block_name_pos = strpos($args, $block_name);
+                $par_string = substr_replace($args, '', $block_name_pos, strlen($block_name));
                 $par_flag = strpos($par_string, '[');
 
                 if($par_flag !== false) {
@@ -46,39 +47,57 @@ class BlockCRUDServiceProvider extends ServiceProvider
                     $parameters = substr($par_string, $par_flag);
 
                 } else {
-                    $scope = str_replace(' ', '', str_replace('\'', '', str_replace(',', '', $par_string)));
+                    $scope = addslashes(str_replace(' ', '', str_replace('\'', '', str_replace(',', '', $par_string))));
                 }
 
                 $code = '<?php
-                    if(' . isset($block_name) . ') {
-                        $block = \Backpack\BlockCRUD\app\Models\BlockItem::active()->where("slug", "' . $block_name . '")->first();
+                    $block_name = "' . $block_name . '";
+
+                    if(isset($block_name) && $block_name != "") {
+                        $block = \Backpack\BlockCRUD\app\Models\BlockItem::active()->where("slug", $block_name)->first();
 
                         if($block) {
                             $echo = $block->content;
                             $parameters = ' . $parameters . ';
 
                             if($block->type == "model") {
-                                if(' . isset($scope) . ' && "' . $scope . '" != "") {
-                                    try {
-                                    
-                                        $items = $block->model::{"' . $scope . '"}()->get();
-                                    
-                                    } catch (\Exception $e) {
-                                        logger($e->getMessage());
-                                        $items = $block->model::all();
+                                try {
+                                    $model = new $block->model();
+                                    $scope = "' . $scope . '";
+
+                                    if(isset($scope) && $scope != "") {
+                                        $argument = null;
+    
+                                        $arg_start = strpos($scope, "(");
+                                        if($arg_start !== false) {
+                                            $argument = str_replace("\"", "", substr($scope, ( (int) $arg_start + 1), -1));
+                                            $scope = substr($scope, 0, $arg_start);
+                                        }
+    
+                                        try {
+                                        
+                                            $items = $model::$scope($argument)->get();
+                                        
+                                        } catch (\Exception $e) {
+                                            logger($e->getMessage());
+                                            $items = $block->model::all();
+                                        }
+                                    } else {
+                                        $items = $model::all();
                                     }
-                                } else {
-                                    $items = $block->model::all();
-                                }
 
-                                if($items) {
-                                    $parameters["items"] = $items;
+                                    if($items) {
+                                        $parameters["items"] = $items;
+                                    }
 
-                                    if(isset($items->first()->blockcrud_template)) {
-                                        $echo = view($items->first()->blockcrud_template, $parameters)->render();
+    
+                                    if(isset($model->blockcrud_template)) {
+                                        $echo = view($model->blockcrud_template, $parameters)->render();
                                     } else {
                                         $echo = view("blockcrud::blocks.default", $parameters)->render();
                                     }
+                                } catch (\Exception $e) {
+                                    logger($e->getMessage());
                                 }
                             } elseif($block->type == "template") {
                                 try {
@@ -91,6 +110,7 @@ class BlockCRUDServiceProvider extends ServiceProvider
                             echo $echo;
                         }
                     }
+
                 ?>';
             }
 
@@ -181,28 +201,43 @@ class BlockCRUDServiceProvider extends ServiceProvider
                         $replace = $block->content;
 
                         if($block->type == "model") {
-                            $model = new $block->model;
-                            if(isset($scope) && $scope != "") {
-                                try {
-                                
-                                    $items = $model::{$scope}()->get();
-                                
-                                } catch (\Exception $e) {
-                                    logger($e->getMessage());
-                                    $items = $model::all();
+                            try {
+                            
+                                $model = new $block->model();
+                                if(isset($scope) && $scope != "") {
+                                    $argument = null;
+                                    $arg_start = strpos($scope, "(");
+                                    if($arg_start !== false) {
+                                        $argument = str_replace("\"", "", substr($scope, ( (int) $arg_start + 1), -1));
+                                        $scope = substr($scope, 0, $arg_start);
+                                    }
+    
+                                    try {
+                                    
+                                        $items = $model::$scope($argument)->get();
+                                    
+                                    } catch (\Exception $e) {
+                                        logger($e->getMessage());
+                                        $items = $block->model::all();
+                                    }
+                                } else {
+                                    $items = $block->model::all();
                                 }
-                            } else {
-                                $items = $model::all();
-                            }
-
-                            if($items) {
-                                $parameters["items"] = $items;
+    
+                                if($items) {
+                                    $parameters["items"] = $items;
+                                }
+    
                                 if(isset($model->blockcrud_template)) {
                                     $replace = view($model->blockcrud_template, $parameters)->render();
                                 } else {
                                     $replace = view("blockcrud::blocks.default", $parameters)->render();
                                 }
+                            
+                            } catch (\Exception $e) {
+                                logger($e->getMessage());
                             }
+
                         } elseif($block->type == "template") {
                             try {
                                 $replace = view($block->model_id, $parameters)->render();
