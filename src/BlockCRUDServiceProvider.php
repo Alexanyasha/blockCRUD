@@ -30,74 +30,173 @@ class BlockCRUDServiceProvider extends ServiceProvider
         $this->publishes([__DIR__ . '/resources/css' => public_path('blockcrud/css')], 'blockcrud');
         $this->publishes([__DIR__ . '/resources/js' => public_path('blockcrud/js')], 'blockcrud');
 
-        Blade::directive('customblock', function ($block_name) {
-            $code = '<?php
-                if(' . $block_name . ') {
-                    $block = \Backpack\BlockCRUD\app\Models\BlockItem::active()->where(\'slug\', ' . $block_name . ')->first();
+        Blade::directive('customblock', function ($args) {
+            $params = explode(',', $args);
+            $parameters = '[]';
 
-                    if($block) {
-                        $echo = $block->content;
+            $code = null;
 
-                        if($block->type == "model") {
-                            $model = new $block->model;
-                            $items = $model::all();
+            if(isset($params[0])) {
+                $block_name = str_replace('(', '', str_replace('\'', '', $params[0]));
+                $par_string = str_replace($block_name, '', $args);
+                $par_flag = strpos($par_string, '[');
 
-                            if($items) {
-                                if(isset($model->blockcrud_template)) {
-                                    $echo = view($model->blockcrud_template, compact("items"))->render();
-                                } else {
-                                    $echo = view("blockcrud::blocks.default", compact("items"))->render();
-                                }
-                            } 
-                        } elseif($block->type == "template") {
-                            try {
-                                $echo = view($block->model_id)->render();
-                            } catch (\Exception $e) {
-                                logger($e->getMessage());
-                            }
-                        }
+                if($par_flag !== false) {
+                    $scope = str_replace(' ', '', str_replace('\'', '', str_replace(',', '', substr($par_string, 0, $par_flag))));
+                    $parameters = substr($par_string, $par_flag);
 
-                        echo $echo;
-                    }
+                } else {
+                    $scope = str_replace(' ', '', str_replace('\'', '', str_replace(',', '', $par_string)));
                 }
-            ?>';
+
+                $code = '<?php
+                    if(' . isset($block_name) . ') {
+                        $block = \Backpack\BlockCRUD\app\Models\BlockItem::active()->where("slug", "' . $block_name . '")->first();
+
+                        if($block) {
+                            $echo = $block->content;
+                            $parameters = ' . $parameters . ';
+
+                            if($block->type == "model") {
+                                if(' . isset($scope) . ' && "' . $scope . '" != "") {
+                                    $items = $block->model::{"' . $scope . '"}()->get();
+                                } else {
+                                    $items = $block->model::all();
+                                }
+
+                                if($items) {
+                                    $parameters["items"] = $items;
+
+                                    if(isset($items->first()->blockcrud_template)) {
+                                        $echo = view($items->first()->blockcrud_template, $parameters)->render();
+                                    } else {
+                                        $echo = view("blockcrud::blocks.default", $parameters)->render();
+                                    }
+                                }
+                            } elseif($block->type == "template") {
+                                try {
+                                    $echo = view($block->model_id, $parameters)->render();
+                                } catch (\Exception $e) {
+                                    logger($e->getMessage());
+                                }
+                            }
+
+                            echo $echo;
+                        }
+                    }
+                ?>';
+            }
 
             return $code;
         });
 
-        Blade::directive('pageblocks', function ($content) {
+        Blade::directive('pageblocks', function ($content) {           
             $code = '<?php
                 $content = ' . $content . ';
 
-                preg_match_all("/@customblock\(\'(?P<slug>.+)\'\)/i", $content, $matches);
+                preg_match_all("/@customblock\(\'(?P<slug>[^\']+)(?P<args>.+)\)/i", $content, $matches);
 
-                foreach($matches["slug"] as $slug) {
+                function multi_explode($string) {
+                    $string = substr(substr($string, 0, -1), 1, strlen($string) - 1);
+                    $out = [];
+
+                    $string = preg_replace_callback("/\[.*?\=\>.*?\]/i", function($match) {
+                        if(isset($match[0])) {
+                            $replaced = preg_replace("/\=\>/i", "|>", $match[0]);
+                            $replaced = preg_replace("/\,/i", "|", $replaced);
+                        
+                            return $replaced;
+                        }
+
+                    }, $string);
+
+                    $arr = explode(",", $string);
+
+                    foreach($arr as $line) {
+                        $line = trim($line);
+
+                        if(strpos($line, "[") === false) {
+                            if(strpos($line, "=>") === false) {
+                                $out[] = str_replace("\'", "", $line);
+                            } else {
+                                $mini_array = explode("=>", $line);
+
+                                if(isset($mini_array[0]) && isset($mini_array[1])) {
+                                    $out[trim(str_replace("\'", "", $mini_array[0]))] = trim(str_replace("\'", "", $mini_array[1]));
+                                }
+                            }
+                        } else {
+                            if(strpos($line, "=>") !== false) {
+                                $mini_array = explode("=>", $line);
+
+                                if(isset($mini_array[0]) && isset($mini_array[1])) {
+                                
+                                    $nested_array = preg_replace_callback("/\[.*?\|\>.*?\]/i", function($match) {
+                                        
+                                        if(isset($match[0])) {
+                                            $replaced = preg_replace("/\|\>/i", "=>", $match[0]);
+                                            $replaced = preg_replace("/\|/i", ",", $replaced);
+                                        
+                                            return $replaced;
+                                        }
+                
+                                    }, $mini_array[1]);
+
+                                    $out[trim(str_replace("\'", "", $mini_array[0]))] = multi_explode(trim($nested_array));
+                                }
+
+                            }
+                        }
+                    }
+
+                    return $out;
+                }
+
+                foreach($matches["slug"] as $key => $slug) {
+                    $args = $matches["args"][$key];
+
+                    $par_flag = strpos($args, "[");
+
+                    if($par_flag !== false) {
+                        $scope = str_replace(" ", "", str_replace("\'", "", str_replace(",", "", substr($args, 0, $par_flag))));
+
+                        $param_string = substr($args, $par_flag);
+                        $parameters = multi_explode($param_string);
+                    } else {
+                        $scope = str_replace(" ", "", str_replace("\'", "", str_replace(",", "", $args)));
+                    }
+
                     $block = \Backpack\BlockCRUD\app\Models\BlockItem::active()->where(\'slug\', $slug)->first();
 
                     if($block) {
+                        $content = str_ireplace("@customblock(", "@customblock-replacing(", $content);
                         $replace = $block->content;
 
                         if($block->type == "model") {
                             $model = new $block->model;
-                            $items = $model::all();
+                            if(isset($scope) && $scope != "") {
+                                $items = $model::{$scope}()->get();
+                            } else {
+                                $items = $model::all();
+                            }
 
                             if($items) {
+                                $parameters["items"] = $items;
                                 if(isset($model->blockcrud_template)) {
-                                    $replace = view($model->blockcrud_template, compact("items"))->render();
+                                    $replace = view($model->blockcrud_template, $parameters)->render();
                                 } else {
-                                    $replace = view("blockcrud::blocks.default", compact("items"))->render();
+                                    $replace = view("blockcrud::blocks.default", $parameters)->render();
                                 }
                             }
-                            
                         } elseif($block->type == "template") {
                             try {
-                                $replace = view($block->model_id)->render();
+                                $replace = view($block->model_id, $parameters)->render();
                             } catch (\Exception $e) {
                                 logger($e->getMessage());
                             }
                         }
 
-                        $content = str_ireplace("@customblock(\'" . $slug . "\')", $replace, $content);
+                        $content = str_ireplace("@customblock-replacing(\'" . $slug . $args . ")", $replace, $content);
                     }
                 }
 
