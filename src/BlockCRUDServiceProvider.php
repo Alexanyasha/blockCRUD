@@ -59,7 +59,14 @@ class BlockCRUDServiceProvider extends ServiceProvider
 
                             if($block->type == "model") {
                                 if(' . isset($scope) . ' && "' . $scope . '" != "") {
-                                    $items = $block->model::{"' . $scope . '"}()->get();
+                                    try {
+                                    
+                                        $items = $block->model::{"' . $scope . '"}()->get();
+                                    
+                                    } catch (\Exception $e) {
+                                        logger($e->getMessage());
+                                        $items = $block->model::all();
+                                    }
                                 } else {
                                     $items = $block->model::all();
                                 }
@@ -154,6 +161,7 @@ class BlockCRUDServiceProvider extends ServiceProvider
 
                 foreach($matches["slug"] as $key => $slug) {
                     $args = $matches["args"][$key];
+                    $parameters = [];
 
                     $par_flag = strpos($args, "[");
 
@@ -175,7 +183,14 @@ class BlockCRUDServiceProvider extends ServiceProvider
                         if($block->type == "model") {
                             $model = new $block->model;
                             if(isset($scope) && $scope != "") {
-                                $items = $model::{$scope}()->get();
+                                try {
+                                
+                                    $items = $model::{$scope}()->get();
+                                
+                                } catch (\Exception $e) {
+                                    logger($e->getMessage());
+                                    $items = $model::all();
+                                }
                             } else {
                                 $items = $model::all();
                             }
