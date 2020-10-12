@@ -4,6 +4,7 @@ namespace Backpack\BlockCRUD\app\Http\Controllers\Admin;
 
 use Backpack\BlockCRUD\app\Http\Requests\BlockRequest;
 use Backpack\CRUD\app\Http\Controllers\CrudController;
+use Backpack\CRUD\app\Http\Controllers\Operations\CloneOperation;
 use Backpack\CRUD\app\Http\Controllers\Operations\CreateOperation;
 use Backpack\CRUD\app\Http\Controllers\Operations\DeleteOperation;
 use Backpack\CRUD\app\Http\Controllers\Operations\ListOperation;
@@ -16,6 +17,7 @@ use RecursiveIteratorIterator;
 class BlockItemCrudController extends CrudController
 {
     use ListOperation;
+    use CloneOperation;
     use CreateOperation;
     use UpdateOperation;
     use DeleteOperation;
@@ -32,6 +34,24 @@ class BlockItemCrudController extends CrudController
         CRUD::setModel("Backpack\BlockCRUD\app\Models\BlockItem");
         CRUD::setRoute(config('backpack.base.route_prefix') . '/blocks');
         CRUD::setEntityNameStrings('block item', 'block items');
+    }
+
+    public function clone($id)
+    {
+        $this->crud->hasAccessOrFail('clone');
+        $this->crud->setOperation('clone');
+
+        $clonedEntry = $this->crud->model->findOrFail($id)->replicate();
+
+        // now resolve the value for unique attribute before save. e.g.
+        $slug = $clonedEntry->slug;
+        $name = $clonedEntry->name;
+        $count = $this->crud->model->whereRaw("slug RLIKE '^{$slug}(-[0-9]+)?$'")->count();
+        $clonedEntry->slug = $count ? "{$slug}-{$count}" : $slug;
+        $clonedEntry->name = $count ? "{$name}-copy-{$count}" : $name;
+
+        // when you are done, save changes
+        return (string) $clonedEntry->push();
     }
 
     protected function setupListOperation()
