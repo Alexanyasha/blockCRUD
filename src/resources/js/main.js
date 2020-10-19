@@ -92,7 +92,8 @@ for (let i = 0; i < codePreviews.length; i++) {
     if(codePreviews[i].shadowRoot) {
         var anchors = codePreviews[i].shadowRoot.querySelectorAll('a');
         for (let a = 0; a < anchors.length; a++) {
-            anchors[a].onclick = function() {return false;};
+            anchors[a].setAttribute('title', anchors[a].getAttribute('href'));
+            anchors[a].removeAttribute('href');
         }
 
         var editorBlocksShadow = codePreviews[i].shadowRoot.querySelectorAll('.blockcrud-editable');
