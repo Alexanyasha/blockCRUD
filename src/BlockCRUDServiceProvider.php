@@ -105,7 +105,10 @@ class BlockCRUDServiceProvider extends ServiceProvider
                                 }
                             } elseif($block->type == "template") {
                                 try {
-                                    $parameters = array_merge($parameters, $block->html_content);
+                                    if($block->html_content) {
+                                        $parameters = array_merge($parameters, $block->html_content);
+                                    }
+                                    
                                     $echo = view($block->model_id, $parameters)->render();
                                 } catch (\Exception $e) {
                                     logger($e->getMessage());
@@ -195,7 +198,9 @@ class BlockCRUDServiceProvider extends ServiceProvider
 
                         } elseif($block->type == "template") {
                             try {
-                                $parameters = array_merge($parameters, $block->html_content);
+                                if($block->html_content) {
+                                    $parameters = array_merge($parameters, $block->html_content);
+                                }
                                 $replace = view($block->model_id, $parameters)->render();
                             } catch (\Exception $e) {
                                 logger($e->getMessage());
