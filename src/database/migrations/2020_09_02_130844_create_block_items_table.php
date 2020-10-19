@@ -13,6 +13,7 @@ class CreateBlockItemsTable extends Migration
             $table->string('slug', 100);
             $table->string('type', 20)->default('html');
             $table->text('content')->nullable();
+            $table->text('html_content')->nullable();
             $table->string('model', 255)->nullable();
             $table->bigInteger('model_id')->unsigned()->nullable();
             $table->tinyInteger('publish')->default(1);

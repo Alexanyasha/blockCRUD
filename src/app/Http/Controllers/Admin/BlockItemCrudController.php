@@ -128,6 +128,29 @@ class BlockItemCrudController extends CrudController
             ],
         ]);
 
+
+        CRUD::addField([
+            'name' => 'code_preview',
+            'label' => 'Содержание шаблона',
+            'type' => 'wysiwyg_template',
+            'fake' => true,
+            'view_namespace' => 'blockcrud::templates',
+            'show_when' => [
+                'type' => 'template',
+            ],
+        ]);
+
+        // CRUD::addField([
+        //     'name' => 'code',
+        //     'label' => 'Содержание',
+        //     'type' => 'hidden',
+        //     'fake' => true,
+        //     'view_namespace' => 'blockcrud::templates',
+        //     'show_when' => [
+        //         'type' => 'html',
+        //     ],
+        // ]);
+
         CRUD::addField([
             'name' => 'model_id',
             'label' => 'Шаблон',

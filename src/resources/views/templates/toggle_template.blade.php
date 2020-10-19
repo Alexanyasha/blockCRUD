@@ -79,6 +79,8 @@
     @endpush
 @endif
 
-@section('after_scripts')
-    <script src="/blockcrud/js/main.js"></script>
-@endsection
+@once
+    @section('after_scripts')
+        <script src="/blockcrud/js/main.js"></script>
+    @endsection
+@endonce

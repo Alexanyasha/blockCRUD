@@ -77,3 +77,54 @@ function toggleInput(e) {
         }
     }
 }
+
+var editorBlocks = document.querySelectorAll('.blockcrud-editable');
+
+for (let i = 0; i < editorBlocks.length; i++) {
+    var editorBlock = editorBlocks[i];
+    
+    editorBlock.addEventListener('click', enableEditor);
+}
+
+ var codePreviews = document.querySelectorAll('.blockcrud-code-preview .blockcrud_preview_area');
+
+for (let i = 0; i < codePreviews.length; i++) {
+    if(codePreviews[i].shadowRoot) {
+        var editorBlocksShadow = codePreviews[i].shadowRoot.querySelectorAll('.blockcrud-editable');
+
+        for (let j = 0; j < editorBlocksShadow.length; j++) {
+            var editorBlockShadow = editorBlocksShadow[j];
+            
+            editorBlockShadow.addEventListener('input', function(e) {
+                enableEditor(e, codePreviews[i]);
+            }, false);
+            editorBlockShadow.addEventListener('change', function(e) {
+                enableEditor(e, codePreviews[i]);
+            }, false);
+            editorBlockShadow.addEventListener('keyup', function(e) {
+                enableEditor(e, codePreviews[i]);
+            }, false);
+            editorBlockShadow.addEventListener('blur', function(e) {
+                enableEditor(e, codePreviews[i]);
+            }, false);
+        }
+    }
+}
+
+function enableEditor(e, outerEl) {
+    var field = e.target.closest('.blockcrud-editable'),
+        arrName = field.closest('.shadow_wrapper').getAttribute('name'),
+        input = outerEl.querySelector('#field_' + field.id);
+
+    console.log(input);
+
+    if(! input) {
+        input = document.createElement('textarea');
+        input.id = 'field_' + field.id;
+        input.setAttribute('name', arrName + '[' + field.id + ']');
+        input.style.display = 'none';
+        outerEl.appendChild(input);
+    }
+
+    input.value = field.innerHTML;
+}

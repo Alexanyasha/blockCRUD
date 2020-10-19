@@ -2,7 +2,8 @@
 
 namespace Backpack\BlockCRUD;
 
-//use Backpack\BlockCRUD\app\Models\BlockItem;
+use Backpack\BlockCRUD\app\Models\BlockItem;
+use Backpack\BlockCRUD\app\Observers\BlockItemObserver;
 use Illuminate\Routing\Router;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\ServiceProvider;
@@ -26,9 +27,12 @@ class BlockCRUDServiceProvider extends ServiceProvider
         $this->loadMigrationsFrom(realpath(__DIR__ . '/database/migrations'));
         $this->loadViewsFrom(realpath(__DIR__ . '/resources/views'), 'blockcrud');
         View::addNamespace('blockcrud', realpath(__DIR__ . '/resources/views'));
+        View::addNamespace('blockcrud_storage', storage_path('app/blockcrud'));
 
         $this->publishes([__DIR__ . '/resources/css' => public_path('blockcrud/css')], 'blockcrud');
         $this->publishes([__DIR__ . '/resources/js' => public_path('blockcrud/js')], 'blockcrud');
+
+        BlockItem::observe(BlockItemObserver::class);
 
         Blade::directive('customblock', function ($args) {
             $params = explode(',', $args);
@@ -101,7 +105,14 @@ class BlockCRUDServiceProvider extends ServiceProvider
                                 }
                             } elseif($block->type == "template") {
                                 try {
+                                    $parameters = array_merge($parameters, $block->html_content);
                                     $echo = view($block->model_id, $parameters)->render();
+                                } catch (\Exception $e) {
+                                    logger($e->getMessage());
+                                }
+                            } elseif($block->type == "html" && \Storage::exists("blockcrud/html/" . $block->id . ".blade.php")) {
+                                try {
+                                    $echo = view("blockcrud_storage::html." . $block->id, $parameters)->render();
                                 } catch (\Exception $e) {
                                     logger($e->getMessage());
                                 }
@@ -123,62 +134,6 @@ class BlockCRUDServiceProvider extends ServiceProvider
 
                 preg_match_all("/@customblock\(\'(?P<slug>[^\']+)(?P<args>.+)\)/i", $content, $matches);
 
-                function multi_explode($string) {
-                    $string = substr(substr($string, 0, -1), 1, strlen($string) - 1);
-                    $out = [];
-
-                    $string = preg_replace_callback("/\[.*?\=\>.*?\]/i", function($match) {
-                        if(isset($match[0])) {
-                            $replaced = preg_replace("/\=\>/i", "|>", $match[0]);
-                            $replaced = preg_replace("/\,/i", "|", $replaced);
-                        
-                            return $replaced;
-                        }
-
-                    }, $string);
-
-                    $arr = explode(",", $string);
-
-                    foreach($arr as $line) {
-                        $line = trim($line);
-
-                        if(strpos($line, "[") === false) {
-                            if(strpos($line, "=>") === false) {
-                                $out[] = str_replace("\'", "", $line);
-                            } else {
-                                $mini_array = explode("=>", $line);
-
-                                if(isset($mini_array[0]) && isset($mini_array[1])) {
-                                    $out[trim(str_replace("\'", "", $mini_array[0]))] = trim(str_replace("\'", "", $mini_array[1]));
-                                }
-                            }
-                        } else {
-                            if(strpos($line, "=>") !== false) {
-                                $mini_array = explode("=>", $line);
-
-                                if(isset($mini_array[0]) && isset($mini_array[1])) {
-                                
-                                    $nested_array = preg_replace_callback("/\[.*?\|\>.*?\]/i", function($match) {
-                                        
-                                        if(isset($match[0])) {
-                                            $replaced = preg_replace("/\|\>/i", "=>", $match[0]);
-                                            $replaced = preg_replace("/\|/i", ",", $replaced);
-                                        
-                                            return $replaced;
-                                        }
-                
-                                    }, $mini_array[1]);
-
-                                    $out[trim(str_replace("\'", "", $mini_array[0]))] = multi_explode(trim($nested_array));
-                                }
-
-                            }
-                        }
-                    }
-
-                    return $out;
-                }
-
                 foreach($matches["slug"] as $key => $slug) {
                     $args = $matches["args"][$key];
                     $parameters = [];
@@ -189,7 +144,7 @@ class BlockCRUDServiceProvider extends ServiceProvider
                         $scope = str_replace(" ", "", str_replace("\'", "", str_replace(",", "", substr($args, 0, $par_flag))));
 
                         $param_string = substr($args, $par_flag);
-                        $parameters = multi_explode($param_string);
+                        $parameters = \Backpack\BlockCRUD\app\Helpers\BlockCRUDHelper::multi_explode($param_string);
                     } else {
                         $scope = str_replace(" ", "", str_replace("\'", "", str_replace(",", "", $args)));
                     }
@@ -240,7 +195,14 @@ class BlockCRUDServiceProvider extends ServiceProvider
 
                         } elseif($block->type == "template") {
                             try {
+                                $parameters = array_merge($parameters, $block->html_content);
                                 $replace = view($block->model_id, $parameters)->render();
+                            } catch (\Exception $e) {
+                                logger($e->getMessage());
+                            }
+                        } elseif($block->type == "html" && \Storage::exists("blockcrud/html/" . $block->id . ".blade.php")) {
+                            try {
+                                $replace = view("blockcrud_storage::html." . $block->id, $parameters)->render();
                             } catch (\Exception $e) {
                                 logger($e->getMessage());
                             }

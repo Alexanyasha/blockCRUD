@@ -88,6 +88,23 @@ public $blockcrud_template = 'blocks.template'; //Template for show instead of H
 public $blockcrud_ignore = true; //Ignore this model in block entities list
 ```
 **Template** (visible if type is Template) - Blade template for include (temporarily readonly field). You can use any standard features of Blade and @customblock directive as well.  
+**Template content** (visible if type is Template) - Preview of template with ability to edit certain blocks. If you want to make block editable, add following attributes to template  
+```
+*Not editable*  
+<div class="some_class>
+    Some text in block
+</div>
+```  
+```
+*Editable*  
+<div class="some_class{{ isset($edit_mode) ? ' blockcrud-editable' : '' }}"
+    @if (isset($edit_mode))
+    contenteditable="true" id="unique_id"
+    @endif
+>
+    {!! $unique_id ?? 'Some text in block' !!}
+</div>
+```  
 **Active** - show on pages flag.  
 
 After creating a block you can insert directive (`@customblock('my-block')`) in any place of your page content. If you use code from database (for example, in PageManager), wrap your code in Blade templates with directive
@@ -118,6 +135,23 @@ public $blockcrud_template = 'blocks.template'; //Файл шаблона вме
 public $blockcrud_ignore = true; //Игнорировать модель в списке сущностей в редактировании блока
 ``` 
 **Шаблон** (показывается, если выбран тип Шаблон) - шаблон Blade (поле временно только для чтения). Можно использовать весь функционал Blade и директиву @customblock.  
+**Содержание шаблона** (показывается, если выбран тип Шаблон) - Превью шаблона с возможностью отредактировать текст в некоторых блоках. Если вы хотите сделать блок редактируемым, добавьте в шаблон следующие атрибуты  
+```
+*Этот блок не редактируется*  
+<div class="some_class>
+    Текст в блоке
+</div>
+```  
+```
+*Этот блок редактируется*  
+<div class="some_class{{ isset($edit_mode) ? ' blockcrud-editable' : '' }}"
+    @if (isset($edit_mode))
+    contenteditable="true" id="unique_id"
+    @endif
+>
+    {!! $unique_id ?? 'Текст в блоке' !!}
+</div>
+```  
 **Активен** - флаг показывать/не показывать на странице.  
 
 После сохранения блока вы можете вставить его в любое место контента страницы с помощью директивы Blade (`@customblock('my-block')`). Если вы используете код из базы данных (например, из аддона PageManager), оберните код в дополнительную директиву Blade
