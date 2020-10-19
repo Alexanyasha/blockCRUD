@@ -90,6 +90,11 @@ for (let i = 0; i < editorBlocks.length; i++) {
 
 for (let i = 0; i < codePreviews.length; i++) {
     if(codePreviews[i].shadowRoot) {
+        var anchors = codePreviews[i].shadowRoot.querySelectorAll('a');
+        for (let a = 0; a < anchors.length; a++) {
+            anchors[a].onclick = function() {return false;};
+        }
+
         var editorBlocksShadow = codePreviews[i].shadowRoot.querySelectorAll('.blockcrud-editable');
 
         for (let j = 0; j < editorBlocksShadow.length; j++) {
@@ -97,15 +102,19 @@ for (let i = 0; i < codePreviews.length; i++) {
             
             editorBlockShadow.addEventListener('input', function(e) {
                 enableEditor(e, codePreviews[i]);
+                return false;
             }, false);
             editorBlockShadow.addEventListener('change', function(e) {
                 enableEditor(e, codePreviews[i]);
+                return false;
             }, false);
             editorBlockShadow.addEventListener('keyup', function(e) {
                 enableEditor(e, codePreviews[i]);
+                return false;
             }, false);
             editorBlockShadow.addEventListener('blur', function(e) {
                 enableEditor(e, codePreviews[i]);
+                return false;
             }, false);
         }
     }
@@ -115,8 +124,6 @@ function enableEditor(e, outerEl) {
     var field = e.target.closest('.blockcrud-editable'),
         arrName = field.closest('.shadow_wrapper').getAttribute('name'),
         input = outerEl.querySelector('#field_' + field.id);
-
-    console.log(input);
 
     if(! input) {
         input = document.createElement('textarea');
