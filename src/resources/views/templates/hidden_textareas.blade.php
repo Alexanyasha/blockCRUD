@@ -4,8 +4,13 @@
     @endsection
 @endonce
 
+@php
+	// if not otherwise specified, the hidden input should take up no space in the form
+    $field['wrapper']['class'] = $field['wrapper']['class'] ?? $field['wrapperAttributes']['class'] ?? "blockcrud_hidden";
+@endphp
+
 @include('crud::fields.inc.wrapper_start')
-    <div class="blockcrud_toggle_wrapper">
+    <div class="blockcrud_toggle_wrapper blockcrud-hidden">
         @if (isset($field['show_when']))
             @foreach ($field['show_when'] as $fi => $val)
                 <input class="blockcrud_toggle_when" type="hidden" name="cond_{{ $fi }}" value="{{ $val }}">
@@ -13,23 +18,16 @@
         @endif
         <label>{!! $field['label'] !!}</label>
         <div class="d-flex">
-            <div class="col-12 blockcrud-code-preview" name="{{ $field['preview_for'] ?? $field['name'] }}">
-                <preview-code-{{ $field['name'] }} stylesheet="/css/style.css" class="blockcrud_preview_area"></preview-code>
+            @if (isset($field['value']) && is_array($field['value']))
+                @foreach ($field['value'] as $name => $textarea)
+                    <textarea 
+                        name="{{ $field['name'] }}[{{ $name }}]"
+                        @include('crud::fields.inc.attributes')
 
-                <script>
-                    customElements.define("preview-code-{{ $field['name'] }}", class extends HTMLElement {
-                        connectedCallback() {
-                            const shadow = this.attachShadow({mode: 'open'});
-                            shadow.innerHTML = `
-                                <link rel="stylesheet" type="text/css" href="${this.getAttribute('stylesheet')}">
-                                <div class="shadow_wrapper" name="{{ $field['preview_for'] ?? $field['name'] }}" @include('crud::fields.inc.attributes')>
-                                    {!! old($field['name']) ? old($field['name']) : (isset($field['value']) ? $field['value'] : (isset($field['default']) ? $field['default'] : '' )) !!}
-                                </div>
-                            `;
-                        }
-                    });
-                </script>
-            </div>
+                        >{{ $textarea }}</textarea>
+
+                @endforeach
+            @endif
         </div>
     </div>
 

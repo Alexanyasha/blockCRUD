@@ -1,14 +1,18 @@
-@section('before_styles')
-    <link rel="stylesheet" type="text/css" href="/blockcrud/css/style.css">
-@endsection
+@once
+    @section('before_styles')
+        <link rel="stylesheet" type="text/css" href="/blockcrud/css/style.css">
+    @endsection
+@endonce
 
 @include('crud::fields.inc.wrapper_start')
     <div class="blockcrud_toggle_wrapper">
+    @if (isset($field['show_when']))
         @forelse ($field['show_when'] as $fi => $val)
             <input class="blockcrud_toggle_when" type="hidden" name="cond_{{ $fi }}" value="{{ $val }}">
         @empty
 
         @endforelse
+    @endif
         <label>{!! $field['label'] !!}</label>
         <div class="blockcrud_code_editor d-flex">
             <div class="blockcrud_code_source col-12 col-lg-6">

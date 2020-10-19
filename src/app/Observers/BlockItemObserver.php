@@ -18,15 +18,5 @@ class BlockItemObserver
                 logger($e->getMessage());
             }
         }
-
-        if($block->type == 'template' && request()->has('code_preview')) {
-            try {
-                
-                $block->html_content = request()->code_preview;
-            
-            } catch (\Exception $e) {
-                logger($e->getMessage());
-            }
-        }
     }
 }

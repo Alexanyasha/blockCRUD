@@ -134,22 +134,22 @@ class BlockItemCrudController extends CrudController
             'label' => 'Содержание шаблона',
             'type' => 'wysiwyg_template',
             'fake' => true,
+            'preview_for' => 'html_content',
             'view_namespace' => 'blockcrud::templates',
             'show_when' => [
                 'type' => 'template',
             ],
         ]);
 
-        // CRUD::addField([
-        //     'name' => 'code',
-        //     'label' => 'Содержание',
-        //     'type' => 'hidden',
+        CRUD::addField([
+            'name' => 'html_content',
+            'type' => 'hidden_textareas',
         //     'fake' => true,
-        //     'view_namespace' => 'blockcrud::templates',
-        //     'show_when' => [
-        //         'type' => 'html',
-        //     ],
-        // ]);
+            'view_namespace' => 'blockcrud::templates',
+            'show_when' => [
+                'type' => 'template',
+            ],
+        ]);
 
         CRUD::addField([
             'name' => 'model_id',

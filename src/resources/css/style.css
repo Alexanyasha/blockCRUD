@@ -11,3 +11,7 @@
 .blockcrud_hidden {
     display: none !important;
 }
+
+.blockcrud-editable {
+    cursor: text;
+}

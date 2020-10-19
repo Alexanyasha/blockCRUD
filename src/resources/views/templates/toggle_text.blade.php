@@ -1,11 +1,13 @@
 <!-- text input -->
 @include('crud::fields.inc.wrapper_start')
     <div class="blockcrud_toggle_wrapper">
+    @if (isset($field['show_when']))
         @forelse ($field['show_when'] as $fi => $val)
             <input class="blockcrud_toggle_when" type="hidden" name="cond_{{ $fi }}" value="{{ $val }}">
         @empty
 
         @endforelse
+    @endif
         <label>{!! $field['label'] !!}</label>
         @include('crud::fields.inc.translatable_icon')
 
