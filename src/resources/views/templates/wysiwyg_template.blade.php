@@ -16,6 +16,17 @@
             <div class="col-12 blockcrud-code-preview" name="{{ $field['preview_for'] ?? $field['name'] }}">
                 <preview-code-{{ $field['name'] }} stylesheet="/css/style.css" stylesheet2="/blockcrud/css/editable.css" class="blockcrud_preview_area"></preview-code>
 
+                @php
+                $template_render = str_replace(
+                    ['<script', '</script>'], 
+                    ['<replaced-script', '</replaced-script>'], 
+                    (old($field['name']) ? old($field['name']) : 
+                        (isset($field['value']) ? $field['value'] : 
+                            (isset($field['default']) ? $field['default'] : '' )
+                        )
+                    )
+                );
+                @endphp
                 <script>
                     customElements.define("preview-code-{{ $field['name'] }}", class extends HTMLElement {
                         connectedCallback() {
@@ -24,11 +35,50 @@
                                 <link rel="stylesheet" type="text/css" href="${this.getAttribute('stylesheet')}">
                                 <link rel="stylesheet" type="text/css" href="${this.getAttribute('stylesheet2')}">
                                 <div class="shadow_wrapper" name="{{ $field['preview_for'] ?? $field['name'] }}" @include('crud::fields.inc.attributes')>
-                                    {!! old($field['name']) ? old($field['name']) : (isset($field['value']) ? $field['value'] : (isset($field['default']) ? $field['default'] : '' )) !!}
+                                    {!! $template_render !!}
                                 </div>
                             `;
+
+                            // var scripts = shadow.querySelectorAll('replaced-script');
+
+                            // for(let s = 0; s < scripts.length; s++) {
+                            //     nodeScriptReplace(scripts[s]);
+                            // }
+
+                            function nodeScriptReplace(node) {
+                                if ( nodeScriptIs(node) === true ) {
+                                    try {
+                                        node.parentNode.replaceChild( nodeScriptClone(node) , node );
+                                    } catch (err) {
+                                        
+                                    }
+                                }
+                                else {
+                                    var i        = 0;
+                                    var children = node.childNodes;
+                                    while ( i < children.length ) {
+                                            nodeScriptReplace( children[i++] );
+                                    }
+                                }
+
+                                return node;
+                            }
+
+                            function nodeScriptIs(node) {
+                                return node.tagName === 'REPLACED-SCRIPT';
+                            }
+
+                            function nodeScriptClone(node){
+                                var script  = document.createElement("script");
+                                script.text = node.innerHTML;
+                                for( var i = node.attributes.length-1; i >= 0; i-- ) {
+                                    script.setAttribute( node.attributes[i].name, node.attributes[i].value );
+                                }
+                                return script;
+                            }
                         }
                     });
+
                 </script>
             </div>
         </div>
