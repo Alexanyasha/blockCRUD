@@ -144,7 +144,6 @@ class BlockItemCrudController extends CrudController
         CRUD::addField([
             'name' => 'html_content',
             'type' => 'hidden_textareas',
-        //     'fake' => true,
             'view_namespace' => 'blockcrud::templates',
             'show_when' => [
                 'type' => 'template',

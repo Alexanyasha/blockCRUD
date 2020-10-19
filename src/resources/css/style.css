@@ -4,14 +4,10 @@
     color: #aaa;
 }
 
-.blockcrud_code_preview {
+.blockcrud_code_preview, .blockcrud-code-preview {
     overflow: auto;
 }
 
 .blockcrud_hidden {
     display: none !important;
-}
-
-.blockcrud-editable {
-    cursor: text;
 }

@@ -1,0 +1,8 @@
+.blockcrud_hidden {
+    display: none !important;
+}
+
+.blockcrud-editable {
+    cursor: text;
+    border: 2px green dashed;
+}

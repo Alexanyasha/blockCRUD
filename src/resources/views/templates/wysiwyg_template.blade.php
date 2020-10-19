@@ -14,7 +14,7 @@
         <label>{!! $field['label'] !!}</label>
         <div class="d-flex">
             <div class="col-12 blockcrud-code-preview" name="{{ $field['preview_for'] ?? $field['name'] }}">
-                <preview-code-{{ $field['name'] }} stylesheet="/css/style.css" class="blockcrud_preview_area"></preview-code>
+                <preview-code-{{ $field['name'] }} stylesheet="/css/style.css" stylesheet2="/blockcrud/css/editable.css" class="blockcrud_preview_area"></preview-code>
 
                 <script>
                     customElements.define("preview-code-{{ $field['name'] }}", class extends HTMLElement {
@@ -22,6 +22,7 @@
                             const shadow = this.attachShadow({mode: 'open'});
                             shadow.innerHTML = `
                                 <link rel="stylesheet" type="text/css" href="${this.getAttribute('stylesheet')}">
+                                <link rel="stylesheet" type="text/css" href="${this.getAttribute('stylesheet2')}">
                                 <div class="shadow_wrapper" name="{{ $field['preview_for'] ?? $field['name'] }}" @include('crud::fields.inc.attributes')>
                                     {!! old($field['name']) ? old($field['name']) : (isset($field['value']) ? $field['value'] : (isset($field['default']) ? $field['default'] : '' )) !!}
                                 </div>
