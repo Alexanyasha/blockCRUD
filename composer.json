@@ -43,7 +43,10 @@
         "laravel": {
             "providers": [
                 "Backpack\\BlockCRUD\\BlockCRUDServiceProvider"
-            ]
+            ],
+            "aliases": {
+                "BlockCRUDHelper": "Backpack\\BlockCRUD\\app\\Helpers\\BlockCRUDHelper"
+            }
         }
     }
 }

@@ -17,16 +17,9 @@
                 <preview-code-{{ $field['name'] }} stylesheet="/css/style.css" stylesheet2="/blockcrud/css/editable.css" class="blockcrud_preview_area"></preview-code>
 
                 @php
-                $template_render = str_replace(
-                    ['<script', '</script>'], 
-                    ['<replaced-script', '</replaced-script>'], 
-                    (old($field['name']) ? old($field['name']) : 
-                        (isset($field['value']) ? $field['value'] : 
-                            (isset($field['default']) ? $field['default'] : '' )
-                        )
-                    )
-                );
+                $template_render = \Backpack\BlockCRUD\app\Helpers\BlockCRUDHelper::replaceScripts(old($field['name']) ? old($field['name']) : (isset($field['value']) ? $field['value'] : (isset($field['default']) ? $field['default'] : '' )));
                 @endphp
+                
                 <script>
                     customElements.define("preview-code-{{ $field['name'] }}", class extends HTMLElement {
                         connectedCallback() {

@@ -58,4 +58,12 @@ class BlockCRUDHelper {
 
         return $out;
     }
+
+    public static function replaceScripts($string) {
+        $tags = ['<script>', '<script ', '</script>'];
+
+        $newtags = ['<replaced-script>', '<replaced-script ', '</replaced-script>'];
+
+        return str_replace($tags, $newtags, $string);
+    }
 }
