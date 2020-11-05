@@ -3,7 +3,13 @@
 namespace Backpack\BlockCRUD\app\Helpers;
 
 class BlockCRUDHelper {
+
+    public static function prepareArrKey($string) {
+        return preg_replace('/\s+/', '', str_replace(' ', '', str_replace("/'", "", str_replace("'", "", $string))));
+    }
+
     public static function multi_explode($string) {
+        $string = html_entity_decode(trim($string));
         $string = substr(substr($string, 0, -1), 1, strlen($string) - 1);
         $out = [];
 
@@ -29,7 +35,9 @@ class BlockCRUDHelper {
                     $mini_array = explode("=>", $line);
 
                     if(isset($mini_array[0]) && isset($mini_array[1])) {
-                        $out[trim(str_replace("\'", "", $mini_array[0]))] = trim(str_replace("\'", "", $mini_array[1]));
+                        $arr_key = self::prepareArrKey($mini_array[0]);
+
+                        $out[$arr_key] = trim(str_replace("/'", "", str_replace("'", "", $mini_array[1])));
                     }
                 }
             } else {
@@ -49,9 +57,10 @@ class BlockCRUDHelper {
     
                         }, $mini_array[1]);
 
-                        $out[trim(str_replace("\'", "", $mini_array[0]))] = multi_explode(trim($nested_array));
-                    }
+                        $arr_key = self::prepareArrKey($mini_array[0]);
 
+                        $out[$arr_key] = multi_explode(trim($nested_array));
+                    }
                 }
             }
         }

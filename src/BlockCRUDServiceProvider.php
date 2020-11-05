@@ -93,7 +93,6 @@ class BlockCRUDServiceProvider extends ServiceProvider
                                     if($items) {
                                         $parameters["items"] = $items;
                                     }
-
     
                                     if(isset($model->blockcrud_template)) {
                                         $echo = view($model->blockcrud_template, $parameters)->render();
