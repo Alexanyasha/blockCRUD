@@ -11,3 +11,28 @@
 .blockcrud_hidden {
     display: none !important;
 }
+
+.blockcrud_code_preview {
+    box-shadow: inset 2px 2px 5px rgba(0, 0, 0, 0.5), inset 2px 2px 5px rgba(0, 0, 0, 0.5);
+}
+
+.blockcrud_sortable {
+    list-style-type: none;
+    padding: 20px;
+}
+
+.blockcrud_sortable .drag {
+    position:relative;
+    cursor:default;
+    z-index:1;
+}
+
+.blockcrud-delete-icon {
+    color: red;
+}
+
+.blockcrud_sortable .blockcrud-delete-icon {
+    cursor: pointer;
+    float: right;
+    margin-top: 4px;
+}

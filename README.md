@@ -121,6 +121,21 @@ For Entity and Template types you can use array with parameters
 @customblock('my-block', ['parameter' => 'value'])
 ```
 
+You can use sortable list of blocks with preview and convenient adding/removing blocks instead of manual adding directives with this page settings:  
+```
+$this->crud->addField([
+    'name' => 'content',
+    'label' => 'Page content',
+    'label_preview' => 'Page content preview',
+    'type' => 'edit_page',
+    'preview_for' => 'content',
+    'fake' => true,
+    'view_namespace' => 'blockcrud::templates',
+    'placeholder' => 'Placeholder',
+]);
+```  
+Blocks scopes and parameters in sorting list will be added soon.  
+
 ### Использование (рус.)
 
 Теперь вы можете создавать и изменять новые блоки в админпанели вашего сайта.  
@@ -168,6 +183,20 @@ public $blockcrud_ignore = true; //Игнорировать модель в сп
 @customblock('my-block', ['parameter' => 'value'])
 ```
 
+Вы можете редактировать контент страницы в режиме списка блоков с сортировкой, добавлением и удалением вместо ручной вставки директив в код. Для этого используйте следующие настройки для поля контента страницы:  
+```
+$this->crud->addField([
+    'name' => 'content',
+    'label' => 'Содержание страницы',
+    'label_preview' => 'Предпросмотр',
+    'type' => 'edit_page',
+    'preview_for' => 'content',
+    'fake' => true,
+    'view_namespace' => 'blockcrud::templates',
+    'placeholder' => 'Плейсхолдер',
+]);
+```  
+Scope и параметры блоков в сортирующемся списке будут добавлены позже.  
 
 ## LICENSE
 GNU GPLv3  

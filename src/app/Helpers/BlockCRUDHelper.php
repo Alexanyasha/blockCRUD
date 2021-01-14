@@ -75,4 +75,20 @@ class BlockCRUDHelper {
 
         return str_replace($tags, $newtags, $string);
     }
+
+    public static function removeDivs($string) {
+        $tags = ['<div>', '</div>'];
+
+        $newtags = ['', ''];
+
+        return str_replace($tags, $newtags, $string);
+    }
+
+    public static function removeBreaks($string) {
+        $tags = ['<br>', '<br/>', '<br />'];
+
+        $newtags = ['', '', ''];
+
+        return str_replace($tags, $newtags, $string);
+    }
 }

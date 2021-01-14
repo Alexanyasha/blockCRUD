@@ -28,7 +28,7 @@
                     <option value="">-</option>
                 @endif
 
-                @if (count($field['options']))
+                @if (isset($field['options']) && count($field['options']))
                     @foreach ($field['options'] as $key => $value)
                         @if ((old(square_brackets_to_dots($field['name'])) && (
                                 $key == old(square_brackets_to_dots($field['name'])) ||

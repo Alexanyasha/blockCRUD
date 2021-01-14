@@ -6,3 +6,10 @@
     cursor: text;
     border: 2px green dashed;
 }
+
+.blockcrud_element {
+    cursor: text;
+    border: 2px grey dashed;
+    zoom: 0.7;
+    margin-bottom: 20px;
+}
