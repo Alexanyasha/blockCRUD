@@ -25,8 +25,8 @@ class BlockRequest extends FormRequest
     public function rules()
     {
         return [
-            'name' => 'required|min:5|max:255',
-            'slug' => 'required|min:5|max:255|unique:block_items,slug,' . $this->id,
+            'name' => 'required|min:2|max:255',
+            'slug' => 'required|min:2|max:255|unique:block_items,slug,' . $this->id,
             'type' => 'required',
         ];
     }

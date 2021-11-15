@@ -136,6 +136,8 @@ $this->crud->addField([
 ```  
 Blocks scopes and parameters in sorting list will be added soon.  
 
+
+
 ### Использование (рус.)
 
 Теперь вы можете создавать и изменять новые блоки в админпанели вашего сайта.  
